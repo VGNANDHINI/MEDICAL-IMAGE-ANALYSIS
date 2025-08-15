@@ -1,0 +1,4 @@
+streamlit
+pillow
+agno
+duckduckgo-search
