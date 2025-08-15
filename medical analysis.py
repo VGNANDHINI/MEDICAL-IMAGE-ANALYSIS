@@ -8,7 +8,7 @@ import streamlit as st
 
  #Set your API Key (Replace with your actual key).
 GOOGLE_API_KEY ="AIzaSyCr35hxFrpVsbNWgq0wU6PwmkpwLm02dJA"
-os.environ("GOOGLE_API_KEY"]=GOOGLE_API_KEY
+os.environ["GOOGLE_API_KEY"]=GOOGLE_API_KEY
 #Ensure API Key is provided
 
 if not GOOGLE_API_KEY:
