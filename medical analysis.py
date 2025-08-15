@@ -7,6 +7,7 @@ from agno.media import Image as AgnoImage
 import streamlit as st
 
  #Set your API Key (Replace with your actual key).
+ 
 GOOGLE_API_KEY ="AIzaSyCr35hxFrpVsbNWgq0wU6PwmkpwLm02dJA"
 os.environ["GOOGLE_API_KEY"]=GOOGLE_API_KEY
 #Ensure API Key is provided
@@ -127,10 +128,10 @@ if uploaded_file is not None:
       with open(image_path, "wb") as f:
         f.write(uploaded_file.getbuffer())
       #Run analysis on the uploaded image
-        report= analyze_medical_image(image_path)
+        report=analyze_medical_image(image_path)
       #Display the report
         st.subheader(" Analysis Report")
-        st.markdown(report, unsafe_allow_html=True)
+      st.markdown(report, unsafe_allow_html=True)
       #Clean up the saved image file
       os.remove(image_path)
 else:
