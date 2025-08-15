@@ -127,7 +127,7 @@ if uploaded_file is not None:
       with open(image_path, "wb") as f:
         f.write(uploaded_file.getbuffer())
       #Run analysis on the uploaded image
-        report analyze_medical_image(image_path)
+        report= analyze_medical_image(image_path)
       #Display the report
         st.subheader(" Analysis Report")
         st.markdown(report, unsafe_allow_html=True)
