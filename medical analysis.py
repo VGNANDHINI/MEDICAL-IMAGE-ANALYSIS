@@ -57,6 +57,14 @@ Ensure a structured and medically accurate response using clear markdown formatt
 # Function to analyze medical image
 def analyze_medical_image(image_path):
     """Processes and analyzes a medical image using AI."""
+    #Example: Request explainability
+    xai_query = query + """
+    Also, provide explainable AI insights:
+    - Highlight image regions that contributed most to your analysis
+    - Provide confidence levels for each finding
+    - Give reasoning behind each diagnosis in simple terms
+    """
+    response = medical_agent.run(xai_query, images=[agno_image])
     
     # Open and resize image
     image = PILImage.open(image_path)
