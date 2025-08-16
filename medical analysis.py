@@ -26,7 +26,7 @@ medical_agent = Agent(
 # -------------------------------
 # 3️⃣ AI Query Template
 # -------------------------------
-query_template = """
+query= """
 You are a highly skilled medical imaging expert with extensive knowledge in radiology and diagnostic imaging. Analyze the medical image and structure your response as follows:
 
 ### 1. Image Type & Region
