@@ -116,7 +116,7 @@ def analyze_medical_image(image_file):
         if temp_path and os.path.exists(temp_path):
             os.remove(temp_path)
 
-    return response_content
+    return response_content,resized_image
 
 
 # -------------------------------
