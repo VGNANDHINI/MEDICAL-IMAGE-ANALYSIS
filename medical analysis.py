@@ -196,11 +196,11 @@ elif choice == "Login":
     if st.button("Login"):
         success, msg = login(username, password)
         if success:
-            st.success(msg)
+            st.success(str(msg))
             st.session_state['login'] = True
             st.session_state['user'] = username
         else:
-            st.error(msg)
+            st.error(str(msg))
 
 #--------------------------------------------------------------------------
 if st.session_state.get('login'):
