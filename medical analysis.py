@@ -53,37 +53,48 @@ You are a highly skilled medical imaging expert with extensive knowledge in radi
 
 Ensure a structured and medically accurate response using clear markdown formatting.
 """
-def analyze_medical_image(image_path):
-    """Processes and analyzes a medical image using AI with explainable AI insights."""
-    agno_image = None  # initialize
-    temp_path = None
-    try:
-        # Open and resize image
-        image = PILImage.open(image_path)
-        width, height = image.size
-        aspect_ratio = width / height
-        new_width = 500
-        new_height = int(new_width / aspect_ratio)
-        resized_image = image.resize((new_width, new_height))
+from PIL import Image as PILImage
 
-        # Save resized image temporarily
-        temp_path = "temp_resized_image.png"
-        resized_image.save(temp_path)
+def analyze_medical_image(image_path, medical_agent):
+    """
+    Processes and analyzes a medical image using AI without repeating sections.
+    Returns the AI response text and the resized image for Streamlit display.
+    """
 
-        # Create agno_image object
-        agno_image = AgnoImage(filepath=temp_path)
+    # Open and resize image
+    image = PILImage.open(image_path)
+    width, height = image.size
+    aspect_ratio = width / height
+    new_width = 500
+    new_height = int(new_width / aspect_ratio)
+    resized_image = image.resize((new_width, new_height))
 
-        # Example: Request explainability
-        xai_query = query + """
-        Also, provide** explainable AI insights**:
-        - Highlight image regions that contributed most to your analysis
-        - Provide confidence levels for each finding
-        - Give reasoning behind each diagnosis in simple terms
-        """
+    # Single query for AI analysis including explainable AI insights
+    query = f"""
+    Analyze this medical image and provide a structured report with the following sections:
+    1. Patient Summary
+    2. Observations
+    3. Diagnosis
+    4. Recommendations
+    5. Research Context
+    
+    Also, provide explainable AI insights:
+    - Highlight image regions that contributed most to your analysis
+    - Provide confidence levels for each finding
+    - Give reasoning behind each diagnosis in simple terms
+    """
 
-        # Run AI analysis
-        response = medical_agent.run(xai_query, images=[agno_image])
-        return response.content
+    # Run the agent with the image
+    response = medical_agent.run(query, images=[image])
+
+    # Remove any repeated headers (optional safety)
+    if "### 5. Research Context" in response:
+        main_report, research_context = response.split("### 5. Research Context", 1)
+        clean_response = main_report + "### 5. Research Context" + research_context.split("### 5. Research Context")[-1]
+    else:
+        clean_response = response
+
+    return clean_response, resized_image
 
     except Exception as e:
         return f"Analysis error: {e}"
