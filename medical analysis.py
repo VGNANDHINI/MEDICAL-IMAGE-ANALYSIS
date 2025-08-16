@@ -55,7 +55,7 @@ Ensure a structured and medically accurate response using clear markdown formatt
 """
 from PIL import Image as PILImage
 
-def analyze_medical_image(image_path, medical_agent):
+def analyze_medical_image(image_path, medical_agent, temp_path=None):
     """
     Processes and analyzes a medical image using AI without repeating sections.
     Returns the AI response text and the resized image for Streamlit display.
@@ -93,15 +93,12 @@ def analyze_medical_image(image_path, medical_agent):
         clean_response = main_report + "### 5. Research Context" + research_context.split("### 5. Research Context")[-1]
     else:
         clean_response = response
-        return clean_response, resized_image
 
+    # Cleanup temporary file if provided
+    if temp_path and os.path.exists(temp_path):
+        os.remove(temp_path)
 
-    finally:
-        # Clean up temporary file
-        if temp_path and os.path.exists(temp_path):
-            os.remove(temp_path)
-
-
+    return clean_response, resized_image
 
 # Streamlit UI setup
 st.set_page_config(page_title="Medical Image Analysis", layout="centered")
