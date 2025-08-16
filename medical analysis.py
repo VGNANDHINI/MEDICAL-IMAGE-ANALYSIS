@@ -93,8 +93,7 @@ def analyze_medical_image(image_path, medical_agent):
         clean_response = main_report + "### 5. Research Context" + research_context.split("### 5. Research Context")[-1]
     else:
         clean_response = response
-
-    return clean_response, resized_image
+        return clean_response, resized_image
 
     except Exception as e:
         return f"Analysis error: {e}"
