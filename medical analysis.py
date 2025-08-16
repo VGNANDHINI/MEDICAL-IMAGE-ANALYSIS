@@ -99,7 +99,7 @@ def analyze_medical_image(image_file):
         # Run AI analysis
         response = medical_agent.run(query_template, images=[agno_image])
         content = response.content if hasattr(response, "content") else str(response)
-------------------------------------------------------------------------------------------------
+#------------------------------------------------------------------------------------------------
    # Append alerts if any condition detected
         for condition, alert_text in condition_alerts.items():
             if condition.lower() in response_content.lower():
