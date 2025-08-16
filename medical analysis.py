@@ -5,8 +5,6 @@ from agno.models.google import Gemini
 from agno.tools.duckduckgo import DuckDuckGoTools
 from agno.media import Image as AgnoImage
 import streamlit as st
-import re
-
 
 # -------------------------------
 # 1️⃣ Set API Key
@@ -91,8 +89,8 @@ def analyze_medical_image(image_file):
         # Run AI analysis
         response = medical_agent.run(query_template, images=[agno_image])
         content = response.content if hasattr(response, "content") else str(response)
-#------------------------------------------------------------------------------------------------
-   # Remove repeated sections if any (safety check)
+
+        # Remove repeated sections if any (safety check)
         if "### 5. Research Context" in content:
             main_report, research_context = content.split("### 5. Research Context", 1)
             content = main_report.strip() + "\n### 5. Research Context" + research_context.strip().split("### 5. Research Context")[-1]
@@ -133,5 +131,4 @@ if uploaded_file is not None:
             st.image(display_image, caption="Resized Image", use_container_width=True)
         
         st.subheader("📝 AI Analysis Report")
-        st.markdown(analysis_text)
-
+        st.markdown(analysis_text
