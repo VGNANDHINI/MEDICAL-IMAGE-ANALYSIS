@@ -131,4 +131,4 @@ if uploaded_file is not None:
             st.image(display_image, caption="Resized Image", use_container_width=True)
         
         st.subheader("📝 AI Analysis Report")
-        st.markdown(analysis_text
+        st.markdown(analysis_text)
