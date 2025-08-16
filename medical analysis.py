@@ -95,8 +95,6 @@ def analyze_medical_image(image_path, medical_agent):
         clean_response = response
         return clean_response, resized_image
 
-    except Exception as e:
-        return f"Analysis error: {e}"
 
     finally:
         # Clean up temporary file
