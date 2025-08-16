@@ -7,14 +7,6 @@ from agno.media import Image as AgnoImage
 import streamlit as st
 import re
 
-CONDITION_RECOMMENDATIONS = {
-    "Pneumonia": "Consult a pulmonologist, start antibiotics, get follow-up X-ray in 1 week.",
-    "Fracture": "Immobilize the area, consult orthopedic specialist, consider X-ray review.",
-    "Tumor": "Consult oncologist, perform biopsy, consider MRI/CT scan.",
-    "Cardiomegaly": "Consult cardiologist, ECG and echocardiography recommended.",
-    "Normal": "No immediate action needed."
-}
-
 
 # -------------------------------
 # 1️⃣ Set API Key
