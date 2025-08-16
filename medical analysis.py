@@ -100,24 +100,20 @@ def analyze_medical_image(image_file):
         response = medical_agent.run(query_template, images=[agno_image])
         content = response.content if hasattr(response, "content") else str(response)
 #------------------------------------------------------------------------------------------------
-   # Append alerts if any condition detected
-        for condition, alert_text in condition_alerts.items():
-            if condition.lower() in response_content.lower():
-                response_content += f"\n\n⚠️ ALERT: {alert_text}"
+   # Remove repeated sections if any (safety check)
+        if "### 5. Research Context" in content:
+            main_report, research_context = content.split("### 5. Research Context", 1)
+            content = main_report.strip() + "\n### 5. Research Context" + research_context.strip().split("### 5. Research Context")[-1]
 
-        # Remove duplicate sections (optional)
-        response_content = re.sub(r"(### 5\. Alerts & Recommendations)(.*?)\1", r"\1\2", response_content, flags=re.DOTALL)
+        return content, resized_image
 
     except Exception as e:
-        response_content = f"Analysis error: {e}"
+        return f"Analysis error: {e}", None
 
     finally:
         # Clean up temporary file
         if temp_path and os.path.exists(temp_path):
             os.remove(temp_path)
-
-    return response_content,resized_image
-
 
 # -------------------------------
 # 5️⃣ Streamlit UI Setup
