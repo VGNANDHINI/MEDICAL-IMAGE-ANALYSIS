@@ -75,7 +75,7 @@ def analyze_medical_image(image_path):
 
         # Example: Request explainability
         xai_query = query + """
-        Also, provide explainable AI insights:
+        Also, provide** explainable AI insights**:
         - Highlight image regions that contributed most to your analysis
         - Provide confidence levels for each finding
         - Give reasoning behind each diagnosis in simple terms
