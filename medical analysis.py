@@ -16,9 +16,6 @@ CONDITION_RECOMMENDATIONS = {
 }
 
 
-
-
-
 # -------------------------------
 # 1️⃣ Set API Key
 # -------------------------------
@@ -102,43 +99,23 @@ def analyze_medical_image(image_file):
         # Run AI analysis
         response = medical_agent.run(query_template, images=[agno_image])
         content = response.content if hasattr(response, "content") else str(response)
+------------------------------------------------------------------------------------------------
+        # Remove repeated sections if any
+        clean_response = re.sub(r"(### 5\. Alerts & Recommendations)(.*?)\1", r"\1\2", response)
 
-        # Remove repeated sections if any (safety check)-----------------------------------------
-        if "### 5. Research Context" in response:
-        main_report, research_context = response.split("### 5. Research Context", 1)
-        clean_response = main_report + "### 5. Research Context" + research_context.split("### 5. Research Context")[-1]
-    else:
-        clean_response = response
+        # Add predefined alerts if key conditions found
+        for condition, alert_text in condition_alerts.items():
+            if condition.lower() in clean_response.lower():
+                clean_response += f"\n\n{alert_text}"
 
-    diagnosis_match = re.search(r"Diagnosis:\s*(.*)", clean_response)
-    confidence_match = re.search(r"Confidence:\s*([0-9.]+)", clean_response)
+        return clean_response
 
-    diagnosis = diagnosis_match.group(1).strip() if diagnosis_match else "Unknown"
-    confidence = float(confidence_match.group(1)) if confidence_match else 0.0
-
-    recommendation_text = CONDITION_RECOMMENDATIONS.get(diagnosis, "Consult specialist for further evaluation.")
-
-    if confidence > 0.85:
-        alert_type = "error"
-        alert_message = f"⚠️ High confidence alert: {diagnosis} detected ({confidence*100:.1f}%). Immediate attention recommended."
-    elif confidence > 0.6:
-        alert_type = "warning"
-        alert_message = f"⚠️ Medium confidence: {diagnosis} detected ({confidence*100:.1f}%). Suggest further evaluation."
-    else:
-        alert_type = "info"
-        alert_message = f"{diagnosis} detected with low confidence ({confidence*100:.1f}%). Monitor or repeat scan if necessary."
-
-    return clean_response, resized_image, alert_type, alert_message, recommendation_text
-    
     except Exception as e:
-        return f"Analysis error: {e}", None
+        return f"Analysis error: {e}"
 
     finally:
-        # Clean up temporary file
         if temp_path and os.path.exists(temp_path):
             os.remove(temp_path)
-
-
 
 
 # -------------------------------
