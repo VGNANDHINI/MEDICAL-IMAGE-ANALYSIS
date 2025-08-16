@@ -210,7 +210,11 @@ if st.session_state.get('login'):
     # All your existing app code goes here
     # Image upload, AI analysis, annotations, report generation, etc.
     st.write(f"Welcome, {st.session_state['user']}! You can now use the app.")
-
+# LOGOUT BUTTON--------------------------------------------------------------
+    if st.sidebar.button("Log Out"):
+        st.session_state['login'] = False
+        st.session_state['user'] = ""
+        st.success("You have been logged out successfully.")
 #--------------------------------------------------------------------------------
 
 st.markdown("""
