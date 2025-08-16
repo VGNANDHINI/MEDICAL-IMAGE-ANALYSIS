@@ -187,7 +187,10 @@ if choice == "Sign Up":
     new_password = st.text_input("Password", type='password')
     if st.button("Sign Up"):
         success, msg = sign_up(new_user, new_password)
-        st.success(msg) if success else st.error(msg)
+        if success:
+            st.success("Account created successfully!")  # <-- hard-coded
+        else:
+            st.error(str(msg))  # ensure msg is string
 
 elif choice == "Login":
     st.subheader("Login to Your Account")
@@ -196,11 +199,11 @@ elif choice == "Login":
     if st.button("Login"):
         success, msg = login(username, password)
         if success:
-            st.success(str(msg))
+            st.success("Login successful!")  # <-- hard-coded
             st.session_state['login'] = True
-            st.session_state['user'] = username
+            st.session_state['user'] = str(username)
         else:
-            st.error(str(msg))
+            st.error(str(msg))  # ensure msg is string
 
 #--------------------------------------------------------------------------
 if st.session_state.get('login'):
