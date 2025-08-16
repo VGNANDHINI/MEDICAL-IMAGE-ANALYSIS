@@ -5,6 +5,19 @@ from agno.models.google import Gemini
 from agno.tools.duckduckgo import DuckDuckGoTools
 from agno.media import Image as AgnoImage
 import streamlit as st
+import re
+
+CONDITION_RECOMMENDATIONS = {
+    "Pneumonia": "Consult a pulmonologist, start antibiotics, get follow-up X-ray in 1 week.",
+    "Fracture": "Immobilize the area, consult orthopedic specialist, consider X-ray review.",
+    "Tumor": "Consult oncologist, perform biopsy, consider MRI/CT scan.",
+    "Cardiomegaly": "Consult cardiologist, ECG and echocardiography recommended.",
+    "Normal": "No immediate action needed."
+}
+
+
+
+
 
 # -------------------------------
 # 1️⃣ Set API Key
@@ -90,13 +103,33 @@ def analyze_medical_image(image_file):
         response = medical_agent.run(query_template, images=[agno_image])
         content = response.content if hasattr(response, "content") else str(response)
 
-        # Remove repeated sections if any (safety check)
-        if "### 5. Research Context" in content:
-            main_report, research_context = content.split("### 5. Research Context", 1)
-            content = main_report.strip() + "\n### 5. Research Context" + research_context.strip().split("### 5. Research Context")[-1]
+        # Remove repeated sections if any (safety check)-----------------------------------------
+        if "### 5. Research Context" in response:
+        main_report, research_context = response.split("### 5. Research Context", 1)
+        clean_response = main_report + "### 5. Research Context" + research_context.split("### 5. Research Context")[-1]
+    else:
+        clean_response = response
 
-        return content, resized_image
+    diagnosis_match = re.search(r"Diagnosis:\s*(.*)", clean_response)
+    confidence_match = re.search(r"Confidence:\s*([0-9.]+)", clean_response)
 
+    diagnosis = diagnosis_match.group(1).strip() if diagnosis_match else "Unknown"
+    confidence = float(confidence_match.group(1)) if confidence_match else 0.0
+
+    recommendation_text = CONDITION_RECOMMENDATIONS.get(diagnosis, "Consult specialist for further evaluation.")
+
+    if confidence > 0.85:
+        alert_type = "error"
+        alert_message = f"⚠️ High confidence alert: {diagnosis} detected ({confidence*100:.1f}%). Immediate attention recommended."
+    elif confidence > 0.6:
+        alert_type = "warning"
+        alert_message = f"⚠️ Medium confidence: {diagnosis} detected ({confidence*100:.1f}%). Suggest further evaluation."
+    else:
+        alert_type = "info"
+        alert_message = f"{diagnosis} detected with low confidence ({confidence*100:.1f}%). Monitor or repeat scan if necessary."
+
+    return clean_response, resized_image, alert_type, alert_message, recommendation_text
+    
     except Exception as e:
         return f"Analysis error: {e}", None
 
@@ -104,6 +137,9 @@ def analyze_medical_image(image_file):
         # Clean up temporary file
         if temp_path and os.path.exists(temp_path):
             os.remove(temp_path)
+
+
+
 
 # -------------------------------
 # 5️⃣ Streamlit UI Setup
