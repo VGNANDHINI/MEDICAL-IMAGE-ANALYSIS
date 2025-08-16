@@ -7,6 +7,27 @@ from agno.media import Image as AgnoImage
 import streamlit as st
 import sqlite3
 import hashlib
+
+
+
+# -------------------------------
+# DATABASE SETUP
+# -------------------------------
+conn = sqlite3.connect("users.db")
+c = conn.cursor()
+c.execute('''CREATE TABLE IF NOT EXISTS users
+             (username TEXT PRIMARY KEY, password TEXT)''')
+conn.commit()
+
+# -------------------------------
+# PASSWORD HASHING FUNCTIONS
+# -------------------------------
+def hash_password(password):
+    return sha256(password.encode()).hexdigest()
+
+def verify_password(hashed_password, user_password):
+    return hashed_password == sha256(user_password.encode()).hexdigest()
+
 #-------------------------------
 ## --- SESSION STATE INIT ---
 #---------------------------------
@@ -54,6 +75,25 @@ if not st.session_state['login'] and not st.session_state['guest']:
         if st.button("Continue as Guest"):
             st.session_state['guest'] = True
             st.experimental_rerun()
+
+
+    ------------------------------
+# MAIN APP SCREEN
+# -------------------------------
+else:
+    user_label = st.session_state['user'] if st.session_state['login'] else "Guest"
+    st.write(f"Welcome, {user_label}! You can now use the app.")
+
+    # -------------------------------
+    # LOGOUT BUTTON
+    # -------------------------------
+    if st.sidebar.button("Log Out"):
+        st.session_state['login'] = False
+        st.session_state['guest'] = False
+        st.session_state['user'] = ""
+        st.success("You have been logged out successfully.")
+        st.experimental_rerun()  # Go back to login screen
+    # -------------------------------
 
     # --- EXISTING IMAGE UPLOAD & ANALYSIS CODE ---
     st.sidebar.header("Upload Your Medical Image:")
@@ -191,45 +231,7 @@ def analyze_medical_image(image_file):
 st.set_page_config(page_title="Medical Image Analysis", layout="centered")
 st.title("🩺 Medical Image Analysis Tool 🔬")
 
-# Sidebar menu for Login / Sign Up---------------------------------------------------------------------
-menu = ["Login", "Sign Up"]
-choice = st.sidebar.selectbox("Menu", menu)
-
-if choice == "Sign Up":
-    st.subheader("Create a New Account")
-    new_user = st.text_input("Username")
-    new_password = st.text_input("Password", type='password')
-    if st.button("Sign Up"):
-        success, msg = sign_up(new_user, new_password)
-        if success:
-            st.success("Account created successfully!")  # <-- hard-coded
-        else:
-            st.error(str(msg))  # ensure msg is string
-
-elif choice == "Login":
-    st.subheader("Login to Your Account")
-    username = st.text_input("Username")
-    password = st.text_input("Password", type='password')
-    if st.button("Login"):
-        success, msg = login(username, password)
-        if success:
-            st.success("Login successful!")  # <-- hard-coded
-            st.session_state['login'] = True
-            st.session_state['user'] = str(username)
-        else:
-            st.error(str(msg))  # ensure msg is string
-
-#--------------------------------------------------------------------------
-if st.session_state.get('login'):
-    # All your existing app code goes here
-    # Image upload, AI analysis, annotations, report generation, etc.
-    st.write(f"Welcome, {st.session_state['user']}! You can now use the app.")
-# LOGOUT BUTTON--------------------------------------------------------------
-    if st.sidebar.button("Log Out"):
-        st.session_state['login'] = False
-        st.session_state['user'] = ""
-        st.success("You have been logged out successfully.")
-#--------------------------------------------------------------------------------
+#---------------------------------------
 
 st.markdown("""
 Welcome to the Medical Image Analysis tool! 📸  
