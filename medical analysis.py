@@ -86,24 +86,32 @@ def analyze_medical_image(image_file):
         # Create agno image object
         agno_image = AgnoImage(filepath=temp_path)
 
-        # Run AI analysis
-        response = medical_agent.run(query_template, images=[agno_image])
-        content = response.content if hasattr(response, "content") else str(response)
+     # Add explainable AI prompt
+        xai_query = query + """
+        Also, provide explainable AI insights:
+        - Highlight regions contributing most to analysis
+        - Confidence levels for each finding
+        - Reasoning behind each diagnosis in simple terms
+        """
 
-        # Remove repeated sections if any (safety check)
-        if "### 5. Research Context" in content:
-            main_report, research_context = content.split("### 5. Research Context", 1)
-            content = main_report.strip() + "\n### 5. Research Context" + research_context.strip().split("### 5. Research Context")[-1]
+        # Retry loop for 429 errors
+        for attempt in range(retries):
+            try:
+                response = medical_agent.run(xai_query, images=[agno_image])
+                return response.content, resized_image
+            except Exception as e:
+                if "429" in str(e):
+                    st.warning(f"API limit reached. Retrying in {delay} seconds...")
+                    time.sleep(delay)
+                else:
+                    return f"Analysis error: {e}", resized_image
 
-        return content, resized_image
-
-    except Exception as e:
-        return f"Analysis error: {e}", None
+        return "Analysis failed after multiple attempts due to API limits.", resized_image
 
     finally:
-        # Clean up temporary file
         if temp_path and os.path.exists(temp_path):
             os.remove(temp_path)
+
 
 # -------------------------------
 # 5️⃣ Streamlit UI Setup
