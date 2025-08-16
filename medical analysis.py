@@ -100,23 +100,23 @@ def analyze_medical_image(image_file):
         response = medical_agent.run(query_template, images=[agno_image])
         content = response.content if hasattr(response, "content") else str(response)
 ------------------------------------------------------------------------------------------------
-    # Remove repeated sections if any
-        clean_response = re.sub(r"(### 5\. Alerts & Recommendations)(.*?)\1", r"\1\2", response)
-
-        # Append predefined alerts if conditions detected
+   # Append alerts if any condition detected
         for condition, alert_text in condition_alerts.items():
-            if condition.lower() in clean_response.lower():
-                clean_response += f"\n\n{alert_text}"
+            if condition.lower() in response_content.lower():
+                response_content += f"\n\n⚠️ ALERT: {alert_text}"
 
-        return clean_response
+        # Remove duplicate sections (optional)
+        response_content = re.sub(r"(### 5\. Alerts & Recommendations)(.*?)\1", r"\1\2", response_content, flags=re.DOTALL)
 
     except Exception as e:
-        return f"Analysis error: {e}"
+        response_content = f"Analysis error: {e}"
 
     finally:
         # Clean up temporary file
         if temp_path and os.path.exists(temp_path):
             os.remove(temp_path)
+
+    return response_content
 
 
 # -------------------------------
