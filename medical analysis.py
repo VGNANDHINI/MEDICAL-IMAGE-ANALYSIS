@@ -53,43 +53,47 @@ You are a highly skilled medical imaging expert with extensive knowledge in radi
 
 Ensure a structured and medically accurate response using clear markdown formatting.
 """
-
-# Function to analyze medical image
 def analyze_medical_image(image_path):
-    """Processes and analyzes a medical image using AI."""
-    #Example: Request explainability
-    xai_query = query + """
-    Also, provide explainable AI insights:
-    - Highlight image regions that contributed most to your analysis
-    - Provide confidence levels for each finding
-    - Give reasoning behind each diagnosis in simple terms
-    """
-    response = medical_agent.run(xai_query, images=[agno_image])
-    
-    # Open and resize image
-    image = PILImage.open(image_path)
-    width, height = image.size
-    aspect_ratio = width / height
-    new_width = 500
-    new_height = int(new_width / aspect_ratio)
-    resized_image = image.resize((new_width, new_height))
-
-    # Save resized image
-    temp_path = "temp_resized_image.png"
-    resized_image.save(temp_path)
-
-    # Create AgnoImage object
-    agno_image = AgnoImage(filepath=temp_path)
-
-    # Run AI analysis
+    """Processes and analyzes a medical image using AI with explainable AI insights."""
+    agno_image = None  # initialize
+    temp_path = None
     try:
-        response = medical_agent.run(query, images=[agno_image])
+        # Open and resize image
+        image = PILImage.open(image_path)
+        width, height = image.size
+        aspect_ratio = width / height
+        new_width = 500
+        new_height = int(new_width / aspect_ratio)
+        resized_image = image.resize((new_width, new_height))
+
+        # Save resized image temporarily
+        temp_path = "temp_resized_image.png"
+        resized_image.save(temp_path)
+
+        # Create agno_image object
+        agno_image = AgnoImage(filepath=temp_path)
+
+        # Example: Request explainability
+        xai_query = query + """
+        Also, provide explainable AI insights:
+        - Highlight image regions that contributed most to your analysis
+        - Provide confidence levels for each finding
+        - Give reasoning behind each diagnosis in simple terms
+        """
+
+        # Run AI analysis
+        response = medical_agent.run(xai_query, images=[agno_image])
         return response.content
+
     except Exception as e:
-        return f"⚠️ Analysis error: {e}"
+        return f"Analysis error: {e}"
+
     finally:
         # Clean up temporary file
-        os.remove(temp_path)
+        if temp_path and os.path.exists(temp_path):
+            os.remove(temp_path)
+
+
 
 # Streamlit UI setup
 st.set_page_config(page_title="Medical Image Analysis", layout="centered")
