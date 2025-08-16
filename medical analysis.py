@@ -100,7 +100,7 @@ def analyze_medical_image(image_file):
         response = medical_agent.run(query_template, images=[agno_image])
         content = response.content if hasattr(response, "content") else str(response)
 ------------------------------------------------------------------------------------------------
-        # Remove repeated sections if any
+       # Remove repeated sections if any
         clean_response = re.sub(r"(### 5\. Alerts & Recommendations)(.*?)\1", r"\1\2", response)
 
         # Add predefined alerts if key conditions found
