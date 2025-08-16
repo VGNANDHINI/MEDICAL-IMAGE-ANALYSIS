@@ -7,56 +7,70 @@ from agno.media import Image as AgnoImage
 import streamlit as st
 import sqlite3
 import hashlib
-
-
-
+#-------------------------------
+## --- SESSION STATE INIT ---
+#---------------------------------
+if 'login' not in st.session_state:
+    st.session_state['login'] = False
+if 'user' not in st.session_state:
+    st.session_state['user'] = ""
+if 'guest' not in st.session_state:
+    st.session_state['guest'] = False
 
 #-------------------------------
-#import database
+## --- new login setup ---
 #---------------------------------
-# Connect to database (or create)
-conn = sqlite3.connect('users.db')
-c = conn.cursor()
 
-# Create users table if not exists
-c.execute('''
-CREATE TABLE IF NOT EXISTS users (
-    username TEXT PRIMARY KEY,
-    password TEXT
-)
-''')
-conn.commit()
-# -------------------------------
-# password
-# -------------------------------
-def hash_password(password):
-    return hashlib.sha256(password.encode()).hexdigest()
+if not st.session_state['login'] and not st.session_state['guest']:
+    st.title("Welcome to Medical Image Analyzer")
+    choice = st.radio("Login / Sign Up / Continue as Guest", ["Login", "Sign Up", "Guest"])
+    
+    if choice == "Sign Up":
+        new_user = st.text_input("Username")
+        new_pass = st.text_input("Password", type="password")
+        if st.button("Sign Up"):
+            c.execute("SELECT * FROM users WHERE username = ?", (new_user,))
+            if c.fetchone():
+                st.warning("Username already exists! Choose a different one.")
+            else:
+                c.execute("INSERT INTO users (username, password) VALUES (?, ?)", (new_user, hash_password(new_pass)))
+                conn.commit()
+                st.success("Account created! Please log in.")
+    
+    elif choice == "Login":
+        username = st.text_input("Username")
+        password = st.text_input("Password", type="password")
+        if st.button("Login"):
+            c.execute("SELECT password FROM users WHERE username = ?", (username,))
+            result = c.fetchone()
+            if result and verify_password(result[0], password):
+                st.session_state['login'] = True
+                st.session_state['user'] = username
+                st.experimental_rerun()
+            else:
+                st.error("Incorrect username or password")
+    
+    elif choice == "Guest":
+        if st.button("Continue as Guest"):
+            st.session_state['guest'] = True
+            st.experimental_rerun()
 
-def verify_password(stored_password, provided_password):
-    return stored_password == hash_password(provided_password)
-# -------------------------------
-# sign up and login
-# -------------------------------
-def sign_up(username, password):
-    try:
-        c.execute('INSERT INTO users (username, password) VALUES (?, ?)', 
-                  (username, hash_password(password)))
-        conn.commit()
-        return True, "User registered successfully!"
-    except sqlite3.IntegrityError:
-        return False, "Username already exists."
+    # --- EXISTING IMAGE UPLOAD & ANALYSIS CODE ---
+    st.sidebar.header("Upload Your Medical Image:")
+    uploaded_file = st.sidebar.file_uploader("Choose a medical image file", type=["jpg", "jpeg", "png", "bmp", "gif"])
 
-def login(username, password):
-    c.execute('SELECT password FROM users WHERE username = ?', (username,))
-    result = c.fetchone()
-    if result:
-        if verify_password(result[0], password):
-            return True, "Login successful!"
-        else:
-            return False, "Incorrect password."
-    else:
-        return False, "User does not exist."
+    if uploaded_file is not None:
+        st.image(uploaded_file, caption="Uploaded Image", use_container_width=True)
 
+        if st.sidebar.button("Analyze Image"):
+            with st.spinner("Analyzing the image... 🔍"):
+                analysis_text, display_image = analyze_medical_image(uploaded_file)
+            
+            if display_image:
+                st.image(display_image, caption="Resized Image", use_container_width=True)
+            
+            st.subheader("📝 AI Analysis Report")
+            st.markdown(analysis_text)
 
 
 
