@@ -5,6 +5,65 @@ from agno.models.google import Gemini
 from agno.tools.duckduckgo import DuckDuckGoTools
 from agno.media import Image as AgnoImage
 import streamlit as st
+import sqlite3
+import hashlib
+
+
+
+
+#-------------------------------
+#import database
+#---------------------------------
+# Connect to database (or create)
+conn = sqlite3.connect('users.db')
+c = conn.cursor()
+
+# Create users table if not exists
+c.execute('''
+CREATE TABLE IF NOT EXISTS users (
+    username TEXT PRIMARY KEY,
+    password TEXT
+)
+''')
+conn.commit()
+# -------------------------------
+# password
+# -------------------------------
+def hash_password(password):
+    return hashlib.sha256(password.encode()).hexdigest()
+
+def verify_password(stored_password, provided_password):
+    return stored_password == hash_password(provided_password)
+# -------------------------------
+# sign up and login
+# -------------------------------
+def sign_up(username, password):
+    try:
+        c.execute('INSERT INTO users (username, password) VALUES (?, ?)', 
+                  (username, hash_password(password)))
+        conn.commit()
+        return True, "User registered successfully!"
+    except sqlite3.IntegrityError:
+        return False, "Username already exists."
+
+def login(username, password):
+    c.execute('SELECT password FROM users WHERE username = ?', (username,))
+    result = c.fetchone()
+    if result:
+        if verify_password(result[0], password):
+            return True, "Login successful!"
+        else:
+            return False, "Incorrect password."
+    else:
+        return False, "User does not exist."
+
+
+
+
+
+
+
+
 
 # -------------------------------
 # 1️⃣ Set API Key
@@ -117,6 +176,40 @@ def analyze_medical_image(image_file):
 # -------------------------------
 st.set_page_config(page_title="Medical Image Analysis", layout="centered")
 st.title("🩺 Medical Image Analysis Tool 🔬")
+
+# Sidebar menu for Login / Sign Up---------------------------------------------------------------------
+menu = ["Login", "Sign Up"]
+choice = st.sidebar.selectbox("Menu", menu)
+
+if choice == "Sign Up":
+    st.subheader("Create a New Account")
+    new_user = st.text_input("Username")
+    new_password = st.text_input("Password", type='password')
+    if st.button("Sign Up"):
+        success, msg = sign_up(new_user, new_password)
+        st.success(msg) if success else st.error(msg)
+
+elif choice == "Login":
+    st.subheader("Login to Your Account")
+    username = st.text_input("Username")
+    password = st.text_input("Password", type='password')
+    if st.button("Login"):
+        success, msg = login(username, password)
+        if success:
+            st.success(msg)
+            st.session_state['login'] = True
+            st.session_state['user'] = username
+        else:
+            st.error(msg)
+
+#--------------------------------------------------------------------------
+if st.session_state.get('login'):
+    # All your existing app code goes here
+    # Image upload, AI analysis, annotations, report generation, etc.
+    st.write(f"Welcome, {st.session_state['user']}! You can now use the app.")
+
+#--------------------------------------------------------------------------------
+
 st.markdown("""
 Welcome to the Medical Image Analysis tool! 📸  
 Upload a medical image (X-ray, MRI, CT, Ultrasound, etc.), and our AI-powered system will analyze it, providing detailed findings, diagnosis, and research insights.
