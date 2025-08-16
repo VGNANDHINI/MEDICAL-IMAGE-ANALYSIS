@@ -64,7 +64,7 @@ Also, provide explainable AI insights:
 # -------------------------------
 # 4️⃣ Function to Analyze Image
 # -------------------------------
-def analyze_medical_image(image_file):
+def analyze_medical_image(image_path,retries=3,delay=5):
     """
     Processes and analyzes a medical image using AI.
     Returns the AI response text and a resized image for display.
