@@ -51,12 +51,13 @@ You are a highly skilled medical imaging expert with extensive knowledge in radi
 - Search for standard treatment protocols.
 - Provide 2-3 key references supporting the analysis.
 
+
 Ensure a structured and medically accurate response using clear markdown formatting.
 """
 
 # Function to analyze medical image
 def analyze_medical_image(image_path):
-    """Processes and analyzes a medical image using AI."""
+    """Processes and analyzes a medical image using AI with explainablity."""
     
     # Open and resize image
     image = PILImage.open(image_path)
@@ -72,6 +73,15 @@ def analyze_medical_image(image_path):
 
     # Create AgnoImage object
     agno_image = AgnoImage(filepath=temp_path)
+
+    ## Modified query with explainability
+    explainable_query = query + """
+    ### 6. Explainable AI Transparency
+    - Show step-by-step reasoning: how each observation leads to a diagnosis.
+    - Highlight image regions that are important (if possible, describe location).
+    - Provide confidence levels (0–100%) for each key finding.
+    - Mention limitations: where the AI may be uncertain or needs human expert confirmation.
+    """
 
     # Run AI analysis
     try:
