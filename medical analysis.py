@@ -6,29 +6,22 @@ from agno.tools.duckduckgo import DuckDuckGoTools
 from agno.media import Image as AgnoImage
 import streamlit as st
 
-# ------------------------------
-# API Key Setup
-# ------------------------------
 # Set your API Key (Replace with your actual key)
-GOOGLE_API_KEY = "YOUR_API_KEY_HERE"
+GOOGLE_API_KEY = "AIzaSyBKKC8cWwEzLnLco2rQpA-JLRx45tO5eyE"
 os.environ["GOOGLE_API_KEY"] = GOOGLE_API_KEY
 
 # Ensure API Key is provided
 if not GOOGLE_API_KEY:
     raise ValueError("⚠️ Please set your Google API Key in GOOGLE_API_KEY")
 
-# ------------------------------
 # Initialize the Medical Agent
-# ------------------------------
 medical_agent = Agent(
     model=Gemini(id="gemini-2.0-flash-exp"),
     tools=[DuckDuckGoTools()],
     markdown=True
 )
 
-# ------------------------------
-# Base Medical Analysis Query
-# ------------------------------
+# Medical Analysis Query
 query = """
 You are a highly skilled medical imaging expert with extensive knowledge in radiology and diagnostic imaging. Analyze the medical image and structure your response as follows:
 
@@ -58,21 +51,13 @@ You are a highly skilled medical imaging expert with extensive knowledge in radi
 - Search for standard treatment protocols.
 - Provide 2-3 key references supporting the analysis.
 
-### 6. Explainable AI Transparency
-- Show step-by-step reasoning: how each observation leads to a diagnosis.
-- Highlight image regions that are important (if possible, describe location).
-- Provide confidence levels (0–100%) for each key finding.
-- Mention limitations: where the AI may be uncertain or needs human expert confirmation.
-
 Ensure a structured and medically accurate response using clear markdown formatting.
 """
 
-# ------------------------------
 # Function to analyze medical image
-# ------------------------------
 def analyze_medical_image(image_path):
     """Processes and analyzes a medical image using AI with explainability."""
-
+    
     # Open and resize image
     image = PILImage.open(image_path)
     width, height = image.size
@@ -88,9 +73,18 @@ def analyze_medical_image(image_path):
     # Create AgnoImage object
     agno_image = AgnoImage(filepath=temp_path)
 
-    # Run AI analysis with explainability
+    # Modified query with explainability
+    explainable_query = query + """
+    ### 6. Explainable AI Transparency
+    - Show step-by-step reasoning: how each observation leads to a diagnosis.
+    - Highlight image regions that are important (if possible, describe location).
+    - Provide confidence levels (0–100%) for each key finding.
+    - Mention limitations: where the AI may be uncertain or needs human expert confirmation.
+    """
+
+    # Run AI analysis
     try:
-        response = medical_agent.run(query, images=[agno_image])
+        response = medical_agent.run(explainable_query, images=[agno_image])
         return response.content
     except Exception as e:
         return f"⚠️ Analysis error: {e}"
@@ -98,25 +92,20 @@ def analyze_medical_image(image_path):
         # Clean up temporary file
         os.remove(temp_path)
 
-# ------------------------------
 # Streamlit UI setup
-# ------------------------------
 st.set_page_config(page_title="Medical Image Analysis", layout="centered")
 st.title("🩺 Medical Image Analysis Tool 🔬")
 st.markdown(
     """
-    Welcome to the **Medical Image Analysis** tool! 📸  
-    Upload a medical image (X-ray, MRI, CT, Ultrasound, etc.), and our AI-powered system will analyze it, providing detailed findings, diagnosis, research insights, **and transparent explainable reasoning**.  
+    Welcome to the **Medical Image Analysis** tool! 📸
+    Upload a medical image (X-ray, MRI, CT, Ultrasound, etc.), and our AI-powered system will analyze it, providing detailed findings, diagnosis, and research insights.
     Let's get started!
     """
 )
 
 # Upload image section
 st.sidebar.header("Upload Your Medical Image:")
-uploaded_file = st.sidebar.file_uploader(
-    "Choose a medical image file", 
-    type=["jpg", "jpeg", "png", "bmp", "gif"]
-)
+uploaded_file = st.sidebar.file_uploader("Choose a medical image file", type=["jpg", "jpeg", "png", "bmp", "gif"])
 
 # Button to trigger analysis
 if uploaded_file is not None:
