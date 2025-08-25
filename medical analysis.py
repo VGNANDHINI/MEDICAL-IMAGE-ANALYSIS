@@ -46,32 +46,62 @@ st.set_page_config(page_title="Medical Image Analysis", layout="wide")
 # --- Inject custom CSS for gradients ---
 st.markdown("""
 <style>
-/* Main background gradient */
-[data-testid="stAppViewContainer"] {
-    background: linear-gradient(to bottom right, #d0f0fd, #d0fdd8);
+/* ---------- FULL PAGE BACKGROUND ---------- */
+.stApp {
+    background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 50%, #a18cd1 100%);
 }
 
-/* Sidebar gradient */
+/* ---------- SIDEBAR BACKGROUND ---------- */
 [data-testid="stSidebar"] {
-    background: linear-gradient(to bottom, #7fffd4, #2f2f2f);
+    background: linear-gradient(180deg, #ffecd2 0%, #fcb69f 100%);
 }
 
-/* Output/report section */
-.css-1d391kg { 
-    background: linear-gradient(to bottom, #003366, #6699ff);
-    padding: 1rem;
-    border-radius: 10px;
-}
-
-/* Button style */
+/* ---------- BUTTONS ---------- */
 .stButton>button {
-    background: linear-gradient(to right, #00c6ff, #0072ff);
+    background: linear-gradient(to right, #f6d365, #fda085);
     color: white;
     font-weight: bold;
-    border-radius: 8px;
+    border-radius: 12px;
+    padding: 10px 24px;
+    transition: 0.3s;
+}
+.stButton>button:hover {
+    background: linear-gradient(to right, #f093fb, #f5576c);
+    transform: scale(1.05);
+}
+
+/* ---------- TITLES & HEADINGS ---------- */
+h1, h2, h3 {
+    font-family: 'Arial Black', sans-serif;
+    color: #ff6f61;
+    text-shadow: 1px 1px 2px #000000;
+}
+
+/* ---------- REPORT / OUTPUT CARDS ---------- */
+.report-card {
+    background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+    border-radius: 12px;
+    padding: 15px;
+    margin: 10px 0;
+    box-shadow: 2px 2px 10px rgba(0,0,0,0.2);
+    color: #333333;
+}
+
+/* ---------- FILE UPLOADER ---------- */
+.css-1y4p8pa {  /* uploader class may vary with Streamlit version */
+    border: 2px dashed #fbc2eb;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* ---------- FOOTER / SMALL TEXT ---------- */
+footer {
+    color: #333333;
+    font-size: 12px;
 }
 </style>
 """, unsafe_allow_html=True)
+
 
 # Title & description
 st.title("🩺 Medical Image Analysis Tool 🔬")
