@@ -1,3 +1,5 @@
+
+
 import os
 from PIL import Image as PILImage
 from agno.agent import Agent
@@ -21,7 +23,7 @@ medical_agent = Agent(
     markdown=True
 )
 
-# Medical Analysis Query
+# Medical Analysis Query with Explainable AI Integration
 query = """
 You are a highly skilled medical imaging expert with extensive knowledge in radiology and diagnostic imaging. Analyze the medical image and structure your response as follows:
 
@@ -41,23 +43,25 @@ You are a highly skilled medical imaging expert with extensive knowledge in radi
 - Support each diagnosis with observed evidence.
 - Highlight critical/urgent findings.
 
-### 4. Patient-Friendly Explanation
+### 4. Explainable AI (XAI)
+- Explain why each finding leads to your diagnosis.
+- Describe image features that influenced the AI decision.
+- Present reasoning in a stepwise, transparent manner.
+
+### 5. Patient-Friendly Explanation
 - Simplify findings in clear, non-technical language.
 - Avoid medical jargon or provide easy definitions.
 - Include relatable visual analogies.
 
-### 5. Research Context
-- Use DuckDuckGo search to find recent medical literature.
-- Search for standard treatment protocols.
-- Provide 2-3 key references supporting the analysis.
-
-Ensure a structured and medically accurate response using clear markdown formatting.
+### 6. Research Context
+- Provide 2-3 unique key references supporting the analysis.
+- Ensure no repeated references in the output.
 """
 
 # Function to analyze medical image
 def analyze_medical_image(image_path):
-    """Processes and analyzes a medical image using AI with explainability."""
-
+    """Processes and analyzes a medical image using AI with XAI explanations."""
+    
     # Open and resize image
     image = PILImage.open(image_path)
     width, height = image.size
@@ -73,18 +77,9 @@ def analyze_medical_image(image_path):
     # Create AgnoImage object
     agno_image = AgnoImage(filepath=temp_path)
 
-    # Modified query with explainability
-    explainable_query = query + """
-### 6. Explainable AI Transparency
-- Show step-by-step reasoning: how each observation leads to a diagnosis.
-- Highlight image regions that are important (if possible, describe location).
-- Provide confidence levels (0–100%) for each key finding.
-- Mention limitations: where the AI may be uncertain or needs human expert confirmation.
-"""
-
     # Run AI analysis
     try:
-        response = medical_agent.run(explainable_query, images=[agno_image])
+        response = medical_agent.run(query, images=[agno_image])
         return response.content
     except Exception as e:
         return f"⚠️ Analysis error: {e}"
@@ -98,7 +93,7 @@ st.title("🩺 Medical Image Analysis Tool 🔬")
 st.markdown(
     """
     Welcome to the **Medical Image Analysis** tool! 📸
-    Upload a medical image (X-ray, MRI, CT, Ultrasound, etc.), and our AI-powered system will analyze it, providing detailed findings, diagnosis, and research insights.
+    Upload a medical image (X-ray, MRI, CT, Ultrasound, etc.), and our AI-powered system will analyze it, providing detailed findings, Explainable AI insights, diagnosis, and research references.
     Let's get started!
     """
 )
@@ -123,10 +118,11 @@ if uploaded_file is not None:
             report = analyze_medical_image(image_path)
             
             # Display the report
-            st.subheader("📋 Analysis Report")
+            st.subheader("📋 Analysis Report with Explainable AI")
             st.markdown(report, unsafe_allow_html=True)
             
             # Clean up the saved image file
             os.remove(image_path)
 else:
     st.warning("⚠️ Please upload a medical image to begin analysis.")
+
