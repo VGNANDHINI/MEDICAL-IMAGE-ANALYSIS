@@ -44,16 +44,20 @@ def analyze_medical_image(image_path):
 st.set_page_config(page_title="Medical Image Analysis", layout="wide")
 
 # --- Inject custom CSS for gradients ---
+# --- CUSTOM CSS FOR VIBRANT FRONTEND ---
 st.markdown("""
 <style>
 /* ---------- FULL PAGE BACKGROUND ---------- */
 .stApp {
     background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 50%, #a18cd1 100%);
+    font-family: 'Arial', sans-serif;
 }
 
 /* ---------- SIDEBAR BACKGROUND ---------- */
 [data-testid="stSidebar"] {
     background: linear-gradient(180deg, #ffecd2 0%, #fcb69f 100%);
+    padding: 20px;
+    border-radius: 12px;
 }
 
 /* ---------- BUTTONS ---------- */
@@ -64,17 +68,25 @@ st.markdown("""
     border-radius: 12px;
     padding: 10px 24px;
     transition: 0.3s;
+    box-shadow: 2px 2px 10px rgba(0,0,0,0.2);
 }
 .stButton>button:hover {
     background: linear-gradient(to right, #f093fb, #f5576c);
     transform: scale(1.05);
 }
 
-/* ---------- TITLES & HEADINGS ---------- */
+/* ---------- HEADINGS ---------- */
 h1, h2, h3 {
-    font-family: 'Arial Black', sans-serif;
     color: #ff6f61;
-    text-shadow: 1px 1px 2px #000000;
+    text-shadow: 2px 2px 5px #000000;
+}
+
+/* ---------- FILE UPLOADER ---------- */
+.css-1y4p8pa {  /* may vary with Streamlit version */
+    border: 2px dashed #fbc2eb;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 10px;
 }
 
 /* ---------- REPORT / OUTPUT CARDS ---------- */
@@ -87,21 +99,15 @@ h1, h2, h3 {
     color: #333333;
 }
 
-/* ---------- FILE UPLOADER ---------- */
-.css-1y4p8pa {  /* uploader class may vary with Streamlit version */
-    border: 2px dashed #fbc2eb;
-    border-radius: 12px;
-    background: rgba(255, 255, 255, 0.2);
-}
-
 /* ---------- FOOTER / SMALL TEXT ---------- */
 footer {
     color: #333333;
     font-size: 12px;
+    text-align: center;
+    padding-top: 20px;
 }
 </style>
 """, unsafe_allow_html=True)
-
 
 # Title & description
 st.title("🩺 Medical Image Analysis Tool 🔬")
