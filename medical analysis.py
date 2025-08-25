@@ -1,5 +1,3 @@
-
-
 import os
 from PIL import Image as PILImage
 from agno.agent import Agent
@@ -7,6 +5,44 @@ from agno.models.google import Gemini
 from agno.tools.duckduckgo import DuckDuckGoTools
 from agno.media import Image as AgnoImage
 import streamlit as st
+
+# ------------------- Custom CSS for vibrant UI -------------------
+st.markdown("""
+<style>
+body {
+    background: linear-gradient(to right, #ff7eb3, #ff758c, #ff7e5f);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #fff;
+}
+h1 {
+    text-align: center;
+    font-size: 3em;
+    text-shadow: 2px 2px 5px #000;
+}
+h2, h3 {
+    color: #fff;
+}
+.stButton>button {
+    background: linear-gradient(to right, #6a11cb, #2575fc);
+    color: white;
+    font-weight: bold;
+    border-radius: 10px;
+    padding: 10px 20px;
+    transition: transform 0.2s;
+}
+.stButton>button:hover {
+    transform: scale(1.05);
+    background: linear-gradient(to right, #2575fc, #6a11cb);
+}
+.stFileUploader {
+    border: 2px dashed #fff;
+    border-radius: 10px;
+    padding: 15px;
+    background: rgba(255,255,255,0.1);
+}
+</style>
+""", unsafe_allow_html=True)
+# ------------------------------------------------------------------
 
 # Set your API Key (Replace with your actual key)
 GOOGLE_API_KEY = "AIzaSyBKKC8cWwEzLnLco2rQpA-JLRx45tO5eyE"
@@ -117,12 +153,21 @@ if uploaded_file is not None:
             # Run analysis on the uploaded image
             report = analyze_medical_image(image_path)
             
-            # Display the report
-            st.subheader("📋 Analysis Report with Explainable AI")
-            st.markdown(report, unsafe_allow_html=True)
+            # Display the report in a vibrant card
+            st.markdown(f"""
+            <div style="
+                background: rgba(0,0,0,0.5); 
+                padding: 20px; 
+                border-radius: 15px; 
+                margin-bottom: 20px; 
+                box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            ">
+            <h3>📋 Analysis Report with Explainable AI</h3>
+            <p>{report}</p>
+            </div>
+            """, unsafe_allow_html=True)
             
             # Clean up the saved image file
             os.remove(image_path)
 else:
     st.warning("⚠️ Please upload a medical image to begin analysis.")
-
