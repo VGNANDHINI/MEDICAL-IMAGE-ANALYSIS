@@ -6,61 +6,69 @@ from agno.tools.duckduckgo import DuckDuckGoTools
 from agno.media import Image as AgnoImage
 import streamlit as st
 
-# ------------------- Add CSS for vibrant gradient UI -------------------
+# ------------------- Set Custom CSS for Gradients -------------------
 st.markdown("""
 <style>
-/* Body background gradient */
+/* Main page background gradient: light blue to light green */
 body {
-    background: linear-gradient(to bottom right, #cce7ff, #99d6ff);
+    background: linear-gradient(to right, #b3e5fc, #b2fab4);
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     color: #000;
 }
 
-/* Sidebar styling */
+/* Sidebar gradient: aquamarine green to dark gray */
 [data-testid="stSidebar"] {
-    background: aquamarine;
-    padding: 20px;
-    border-radius: 10px;
+    background: linear-gradient(to bottom, #7FFFD4, #2c2c2c);
 }
 
-/* Headings with subtle shadow */
-h1, h2, h3 {
-    text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+/* Title styling */
+h1 {
+    text-align: center;
+    font-size: 2.8em;
+    font-weight: bold;
+    color: #004d99;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
 }
 
-/* Button styling */
+/* Subtitle/description */
+h2, h3, p {
+    color: #004d99;
+}
+
+/* Analyze button with hover effect */
 .stButton>button {
-    background: linear-gradient(to right, #6a11cb, #2575fc);
-    color: white;
+    background: linear-gradient(to right, #4db8ff, #66ff99);
+    color: #000;
     font-weight: bold;
     border-radius: 10px;
-    padding: 10px 20px;
-    transition: transform 0.2s, background 0.2s;
+    padding: 12px 25px;
+    transition: transform 0.2s;
 }
 .stButton>button:hover {
     transform: scale(1.05);
-    background: linear-gradient(to right, #2575fc, #6a11cb);
+    background: linear-gradient(to right, #66ff99, #4db8ff);
 }
 
 /* File uploader styling */
 .stFileUploader {
-    border: 2px dashed #000;
+    border: 2px dashed #004d99;
     border-radius: 10px;
     padding: 15px;
     background: rgba(255, 255, 255, 0.2);
 }
 
-/* Report card styling */
-.report-card {
-    background: rgba(255,255,255,0.8);
+/* Output card gradient: dark blue to lighter blue */
+.output-card {
+    background: linear-gradient(to right, #003366, #3399ff);
+    color: #fff;
     border-radius: 15px;
     padding: 20px;
     margin-bottom: 20px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
 }
 </style>
 """, unsafe_allow_html=True)
-# -------------------------------------------------------------------------
+# ---------------------------------------------------------------------
 
 # Set your API Key (Replace with your actual key)
 GOOGLE_API_KEY = "AIzaSyBKKC8cWwEzLnLco2rQpA-JLRx45tO5eyE"
@@ -148,7 +156,6 @@ st.markdown(
     """
     Welcome to the **Medical Image Analysis** tool! 📸
     Upload a medical image (X-ray, MRI, CT, Ultrasound, etc.), and our AI-powered system will analyze it, providing detailed findings, Explainable AI insights, diagnosis, and research references.
-    Let's get started!
     """
 )
 
@@ -171,11 +178,11 @@ if uploaded_file is not None:
             # Run analysis on the uploaded image
             report = analyze_medical_image(image_path)
             
-            # Display the report in a styled card
+            # Display the report in a gradient output card
             st.markdown(f"""
-            <div class="report-card">
-                <h3>📋 Analysis Report with Explainable AI</h3>
-                <p>{report}</p>
+            <div class="output-card">
+            <h3>📋 Analysis Report with Explainable AI</h3>
+            <p>{report}</p>
             </div>
             """, unsafe_allow_html=True)
             
